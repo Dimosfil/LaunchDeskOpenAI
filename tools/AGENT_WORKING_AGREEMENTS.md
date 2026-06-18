@@ -92,7 +92,9 @@
   language names or numbers. Render each option as a task-list bullet with the
   number inside the label, such as `- [x] 1. English`; do not use
   `1. [x] English`, because some chat renderers split the checkbox and label
-  onto separate lines.
+  onto separate lines. Keep the checkbox marker, number, and label on one
+  physical Markdown line; never emit a standalone checkbox line followed by a
+  separate numbered label line.
 - When reporting this change, mention the plain
   `tools/project-memory/git-preferences.json` path instead of malformed or
   placeholder markdown links.
@@ -132,7 +134,10 @@ or:
 - If the unified project-language command does not include explicit languages,
   ask in three numbered steps. For each step, show a concise numbered Markdown
   checklist with the available languages and the current selection, then accept
-  the user's next answer as numbers or language names for that step.
+  the user's next answer as numbers or language names for that step. Render
+  each option as a task-list bullet with the checkbox marker, number, and label
+  on one physical Markdown line, such as `- [x] 1. English`; never emit a
+  standalone checkbox line followed by a separate numbered label line.
 - If the user replies with only numbers, such as `1 2`, map them to the most
   recent checklist and preserve that order. Do not ask what those numbers mean
   after showing the checklist.
