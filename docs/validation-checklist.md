@@ -16,6 +16,7 @@
 - [ ] Submit button starts a streamed run without a page reload.
 - [ ] Tool progress events appear while the run is active.
 - [ ] Model text deltas progressively populate the output area.
+- [ ] Tasks tab shows bilingual task cards with human-hours, agent-hours, estimate basis text, and header totals after the final response.
 - [ ] API errors appear in the UI without clearing the user's form input.
 - [ ] Layout remains usable on desktop and mobile viewport widths.
 

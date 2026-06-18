@@ -44,6 +44,11 @@ describe("Codex app launch planning prompt", () => {
     expect(events).toContain("draft_channel_launch_copy:completed");
     expect(prompt).toContain("Local deterministic tool outputs");
     expect(prompt).toContain("Risk register");
+    expect(prompt).toContain("TASK_CARDS_JSON");
+    expect(prompt).toContain("titleRu");
+    expect(prompt).toContain("agentHours");
+    expect(prompt).toContain("Use this humanHours rubric");
+    expect(prompt).toContain("estimateBasisRu");
     expect(prompt).toContain("Engineering Lead");
   });
 });

@@ -343,6 +343,47 @@ Use the tool outputs as evidence. Return a concise release plan with these secti
 3. Owner checklist
 4. Launch copy
 5. Follow-up questions
+
+After the readable plan, append a machine-readable task card block exactly in this shape:
+TASK_CARDS_JSON
+\`\`\`json
+{
+  "tasks": [
+    {
+      "id": "T1",
+      "titleRu": "Short Russian task name",
+      "titleEn": "Short English task name",
+      "descriptionRu": "Russian task description with the expected outcome.",
+      "descriptionEn": "English task description with the expected outcome.",
+      "humanHours": 4,
+      "agentHours": 1.5,
+      "estimateBasisRu": "Russian basis for the estimate.",
+      "estimateBasisEn": "English basis for the estimate."
+    }
+  ]
+}
+\`\`\`
+
+Create one task card for each concrete priority-plan work item. Estimate the launch/readiness
+work described by the task, not the full product implementation, unless the task explicitly says
+to build or modify product functionality.
+
+Use this humanHours rubric:
+- 1-2: review, wording, or a small checklist update.
+- 3-5: one owner prepares or verifies one launch artifact.
+- 6-10: cross-functional coordination, metrics setup, QA/readiness review, or multiple artifacts.
+- 11-20: engineering implementation, new instrumentation, integration work, or multi-team signoff.
+- 21+: feature build work or unclear scope that needs discovery.
+
+Use this agentHours rubric:
+- 0.5-1: summarize, rewrite, or produce one small draft.
+- 1.5-3: draft several artifacts, convert notes into a checklist, or compare inputs.
+- 3.5-6: analyze requirements, produce structured launch assets, or create test/review materials.
+- 6+: large multi-artifact generation or work needing iterative validation.
+
+For each card, include estimateBasisRu and estimateBasisEn in one short sentence that names the
+assumption behind the estimate. Use numbers only for hour estimates. Keep the JSON valid and do
+not add comments inside it.
 `;
 }
 

@@ -73,6 +73,8 @@ textarea {
 
 h1,
 h2,
+h3,
+h4,
 p {
   margin: 0;
 }
@@ -85,6 +87,17 @@ h1 {
 
 h2 {
   font-size: 1.25rem;
+  letter-spacing: 0;
+}
+
+h3 {
+  font-size: 1rem;
+  letter-spacing: 0;
+}
+
+h4 {
+  font-size: 0.95rem;
+  line-height: 1.25;
   letter-spacing: 0;
 }
 
@@ -240,6 +253,40 @@ input:focus {
   padding: 12px;
 }
 
+.outputTabs {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  width: fit-content;
+  max-width: 100%;
+  padding: 4px;
+  border: 1px solid #dce7e3;
+  border-radius: 8px;
+  background: #f4f8f6;
+}
+
+.tabButton {
+  height: 34px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  border: 0;
+  border-radius: 6px;
+  padding: 0 12px;
+  color: #53645f;
+  background: transparent;
+  font-size: 0.88rem;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.tabButton.active {
+  color: #174c45;
+  background: #ffffff;
+  box-shadow: 0 1px 4px rgba(32, 48, 44, 0.1);
+}
+
 .planOutput {
   min-height: 360px;
   border: 1px solid #dfe7e4;
@@ -270,6 +317,153 @@ input:focus {
   color: #6e7f79;
 }
 
+.tasksOutput {
+  min-height: 360px;
+  border: 1px solid #dfe7e4;
+  border-radius: 8px;
+  background: #fbfdfc;
+  overflow: auto;
+  padding: 16px;
+}
+
+.tasksHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid #e4ece9;
+}
+
+.totalMetrics {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.metricPill {
+  height: 32px;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  border-radius: 8px;
+  padding: 0 10px;
+  color: #174c45;
+  background: #e8f4f0;
+  font-size: 0.84rem;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.taskGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 12px;
+  padding-top: 14px;
+}
+
+.taskCard {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  min-width: 0;
+  border: 1px solid #d8e4e0;
+  border-radius: 8px;
+  background: #ffffff;
+  padding: 14px;
+}
+
+.taskCardTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.taskId,
+.languageLabel {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  font-size: 0.72rem;
+  font-weight: 900;
+  letter-spacing: 0;
+}
+
+.taskId {
+  min-width: 34px;
+  height: 26px;
+  padding: 0 8px;
+  color: #ffffff;
+  background: #174c45;
+}
+
+.taskEstimates {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 6px;
+}
+
+.taskEstimates span {
+  height: 26px;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  border: 1px solid #dce7e3;
+  border-radius: 6px;
+  padding: 0 7px;
+  color: #53645f;
+  background: #f7faf9;
+  font-size: 0.78rem;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.taskLanguageBlock {
+  display: grid;
+  grid-template-columns: 32px minmax(0, 1fr);
+  gap: 5px 10px;
+}
+
+.languageLabel {
+  width: 28px;
+  height: 22px;
+  color: #7b4248;
+  background: #fff1f2;
+  grid-row: span 2;
+}
+
+.taskLanguageBlock p {
+  color: #4f5f5a;
+  font-size: 0.88rem;
+}
+
+.estimateBasis {
+  display: grid;
+  grid-template-columns: 18px minmax(0, 1fr);
+  gap: 8px;
+  border-top: 1px solid #edf2f0;
+  padding-top: 10px;
+  color: #7b4248;
+}
+
+.estimateBasis p {
+  color: #5d6c67;
+  font-size: 0.82rem;
+}
+
+.estimateBasis p + p {
+  margin-top: 4px;
+}
+
+.taskEmpty {
+  min-height: 280px;
+  gap: 8px;
+}
+
 @media (max-width: 980px) {
   .appShell {
     padding: 14px;
@@ -286,12 +480,25 @@ input:focus {
 
 @media (max-width: 620px) {
   .twoColumn,
-  .outputHeader {
+  .outputHeader,
+  .tasksHeader {
     grid-template-columns: 1fr;
     display: grid;
   }
 
   .brandRow {
     align-items: flex-start;
+  }
+
+  .outputTabs {
+    width: 100%;
+  }
+
+  .tabButton {
+    flex: 1 1 0;
+  }
+
+  .totalMetrics {
+    justify-content: flex-start;
   }
 }
