@@ -2,9 +2,10 @@
 
 ## Project
 
-LaunchDeskOpenAI. The product purpose, audience, and primary runtime surface are
-not documented yet; preserve this section as the first place to record them when
-the project scope is defined.
+LaunchDeskOpenAI is the Launch Desk app: a local React/Vite + Express web
+application backed by the OpenAI Agents SDK. It helps engineering teams turn a
+rough launch idea into a release plan with prioritized work, risks, owner
+checklists, launch copy, and follow-up questions.
 
 ## Restore Context
 

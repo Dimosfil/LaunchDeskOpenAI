@@ -1,4 +1,9 @@
 # Local/generated AI-agent memory and runtime noise
+node_modules/
+dist/
+.env
+.env.*
+!.env.example
 tools/project-memory/*.sqlite
 tools/project-memory/*.sqlite-*
 tools/project-memory/*.db

@@ -1,0 +1,7 @@
+{
+  "version": 1,
+  "serviceId": "launch-desk-openai",
+  "selfRegistration": "on",
+  "configServiceUrl": "http://127.0.0.1:4100",
+  "preferredPort": 8787
+}
