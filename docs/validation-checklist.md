@@ -30,5 +30,7 @@
 
 - [ ] `npm run typecheck`
 - [ ] `npm test`
-- [ ] Backend process sees `OPENAI_API_KEY`.
+- [ ] Backend health reports `runtime: "codex-app"` by default.
+- [ ] Codex CLI/app auth is available for the local user.
 - [ ] `npm run verify:stream` receives at least one `tool_progress`, one `text_delta`, and one `final` event.
+- [ ] Optional OpenAI Agents SDK path: set `LAUNCH_DESK_AGENT_RUNTIME=openai-agents` and verify the backend process sees `OPENAI_API_KEY`.

@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { launchDeskModel } from "../../agent/launchDeskAgent";
+import { getLaunchDeskModel, getLaunchDeskRuntime } from "../../agent/runtime";
 import { serviceCapabilities, serviceId, serviceName, servicePaths } from "../serviceMetadata";
 
 export const agentInfoRouter = Router();
@@ -18,7 +18,8 @@ agentInfoRouter.get("/agent/guide", (_req, res) => {
     ],
     privacy: [
       "Do not send secrets, credentials, customer private data, or production incident details unless explicitly approved.",
-      "Launch brief content is sent to the configured OpenAI model from the server process."
+      "By default, launch brief content is sent through the local signed-in Codex app runtime from this project folder.",
+      "Set LAUNCH_DESK_AGENT_RUNTIME=openai-agents only when you intentionally want the OpenAI Agents SDK path that requires OPENAI_API_KEY."
     ],
     endpoints: {
       health: servicePaths.health,
@@ -28,7 +29,8 @@ agentInfoRouter.get("/agent/guide", (_req, res) => {
       launchPlan: "/api/launch-plan"
     },
     capabilities: serviceCapabilities,
-    model: launchDeskModel
+    runtime: getLaunchDeskRuntime(),
+    model: getLaunchDeskModel()
   });
 });
 
@@ -42,7 +44,7 @@ agentInfoRouter.get("/agent/contract", (_req, res) => {
       {
         method: "GET",
         path: "/api/health",
-        description: "Check service readiness and whether OPENAI_API_KEY is visible to the backend."
+        description: "Check service readiness, selected runtime, model, and whether the API key is required."
       },
       {
         method: "GET",
@@ -73,7 +75,9 @@ agentInfoRouter.get("/agent/contract", (_req, res) => {
         response: {
           contentType: "text/event-stream",
           events: ["status", "tool_progress", "text_delta", "final", "error"]
-        }
+        },
+        runtime:
+          "Default runtime is codex-app through local Codex app-server. OpenAI Agents SDK is available with LAUNCH_DESK_AGENT_RUNTIME=openai-agents and OPENAI_API_KEY."
       }
     ],
     schemas: {

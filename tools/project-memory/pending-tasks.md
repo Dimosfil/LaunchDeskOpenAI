@@ -14,6 +14,36 @@ generated outputs, secrets, credentials, or private production data.
 
 ## Tasks
 
+### 2026-06-18 Codex App Runtime
+
+Goal: Let Launch Desk generate plans through the signed-in Codex app runtime
+without requiring `OPENAI_API_KEY` for normal local use.
+
+Planned changes:
+
+- [x] Add a backend runtime selector with `codex-app` as the default.
+- [x] Add a TypeScript Codex app-server runner scoped to this project folder.
+- [x] Keep the existing OpenAI Agents SDK path available as an opt-in runtime.
+- [x] Update health, agent guide, contract, docs, and validation text.
+
+Execution order:
+
+- [x] Restore local project context and inspect current OpenAI-key dependency.
+- [x] Implement Codex app-server streaming for `/api/launch-plan`.
+- [x] Add tests for runtime selection and Codex prompt shaping.
+- [x] Run typecheck/tests and a streaming verifier when feasible.
+
+Risks or dependencies:
+
+- [x] Real Codex streaming requires the local Codex CLI/app auth to be working.
+- [x] The backend must run `codex app-server` from `D:\AI\LaunchDeskOpenAI`, not a sibling project.
+
+Verification:
+
+- [x] `npm run typecheck`
+- [x] `npm test`
+- [x] `npm run verify:stream` with the Codex runtime when local app-server auth is available.
+
 ### 2026-06-18 GI Config-Service Registration
 
 Goal: Make Launch Desk a GI config-service registered local web/API service.

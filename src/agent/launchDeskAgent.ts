@@ -1,8 +1,9 @@
 import { Agent, Runner } from "@openai/agents";
 import { launchDeskInstructions } from "./instructions";
+import { getLaunchDeskModel } from "./runtime";
 import { launchTools } from "../tools/launchTools";
 
-export const launchDeskModel = process.env.LAUNCH_DESK_MODEL || "gpt-5.5";
+export const launchDeskModel = getLaunchDeskModel();
 
 export const launchDeskAgent = new Agent({
   name: "Launch Desk",

@@ -11,6 +11,7 @@ export const servicePaths = {
 
 export const serviceCapabilities = [
   "launch-planning-agent",
+  "codex-app-runtime",
   "openai-agents-sdk",
   "sse-streaming",
   "agent-guide",
@@ -35,6 +36,6 @@ export function buildServiceRecord(port: number) {
     },
     apiVersion: "v1",
     notes:
-      "Local Launch Desk app: React/Vite frontend plus Express/OpenAI Agents SDK API. Discovery metadata only; no secrets."
+      "Local Launch Desk app: React/Vite frontend plus Express API. Default planning runtime uses signed-in Codex app-server; OpenAI Agents SDK is opt-in. Discovery metadata only; no secrets."
   };
 }

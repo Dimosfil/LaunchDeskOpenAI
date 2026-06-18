@@ -1,6 +1,6 @@
 # Launch Desk
 
-Launch Desk is a full-stack OpenAI Agents SDK app that helps engineering teams turn a rough launch idea into an actionable release plan.
+Launch Desk is a full-stack local planning app that helps engineering teams turn a rough launch idea into an actionable release plan.
 
 Users enter a product brief, audience, launch date, constraints, and available assets. The backend streams an agent run that produces a prioritized plan, risk register, owner checklist, launch copy suggestions, and follow-up questions.
 
@@ -8,7 +8,7 @@ Users enter a product brief, audience, launch date, constraints, and available a
 
 - `src/frontend/` - React/Vite UI for the Launch Desk workspace.
 - `src/server/` - Express API routes and SSE streaming helpers.
-- `src/agent/` - Launch Desk agent setup, instructions, prompt builder, and runner.
+- `src/agent/` - Launch Desk runtime selection, Codex app runner, optional OpenAI Agents SDK setup, instructions, and prompt builder.
 - `src/tools/` - deterministic function tools used by the agent.
 - `src/shared/` - shared request and stream schemas.
 - `tests/` - local unit tests for tool behavior.
@@ -23,16 +23,27 @@ Install dependencies:
 npm install
 ```
 
-Set `OPENAI_API_KEY` in the environment that starts the backend. On Windows, if the key is stored as a User environment variable, start a fresh shell or pass it into the process:
+Default runtime:
 
 ```powershell
-$env:OPENAI_API_KEY = [Environment]::GetEnvironmentVariable('OPENAI_API_KEY', 'User')
+$env:LAUNCH_DESK_AGENT_RUNTIME = 'codex-app'
 ```
+
+`codex-app` is the default, so this variable is optional. It starts `codex app-server`
+from this project folder and uses the signed-in local Codex app/CLI auth path instead
+of `OPENAI_API_KEY`.
 
 Optional model override:
 
 ```powershell
 $env:LAUNCH_DESK_MODEL = 'gpt-5.5'
+```
+
+Optional OpenAI Agents SDK mode:
+
+```powershell
+$env:LAUNCH_DESK_AGENT_RUNTIME = 'openai-agents'
+$env:OPENAI_API_KEY = [Environment]::GetEnvironmentVariable('OPENAI_API_KEY', 'User')
 ```
 
 ## Run Locally
@@ -90,7 +101,7 @@ Run typecheck:
 npm run typecheck
 ```
 
-With the backend running and `OPENAI_API_KEY` visible to the backend process, verify real streaming:
+With the backend running and local Codex app/CLI auth available, verify real streaming:
 
 ```powershell
 npm run verify:stream
@@ -111,7 +122,7 @@ Then add it to `launchTools` and update `src/agent/instructions.ts` so the agent
 
 ## Observability
 
-The app uses the Agents SDK runner with tracing enabled by default. Set this to disable local tracing export:
+When `LAUNCH_DESK_AGENT_RUNTIME=openai-agents`, the app uses the Agents SDK runner with tracing enabled by default. Set this to disable local tracing export:
 
 ```powershell
 $env:LAUNCH_DESK_TRACING_DISABLED = 'true'

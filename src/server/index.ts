@@ -4,6 +4,7 @@ import http from "node:http";
 import { agentInfoRouter } from "./routes/agentInfo";
 import { launchPlanRouter } from "./routes/launchPlan";
 import { registerService, resolveStartupDecision } from "./configService";
+import { getLaunchDeskModel, getLaunchDeskRuntime } from "../agent/runtime";
 
 const app = express();
 
@@ -12,11 +13,15 @@ app.use(express.json({ limit: "1mb" }));
 app.use(agentInfoRouter);
 
 app.get("/api/health", (_req, res) => {
+  const runtime = getLaunchDeskRuntime();
   res.json({
     ok: true,
     app: "Launch Desk",
-    model: process.env.LAUNCH_DESK_MODEL || "gpt-5.5",
-    apiKeyConfigured: Boolean(process.env.OPENAI_API_KEY)
+    runtime,
+    model: getLaunchDeskModel(),
+    apiKeyConfigured: runtime === "openai-agents" && Boolean(process.env.OPENAI_API_KEY),
+    apiKeyRequired: runtime === "openai-agents",
+    openAiAgentsApiKeyConfigured: Boolean(process.env.OPENAI_API_KEY)
   });
 });
 

@@ -1,7 +1,8 @@
 import { Router } from "express";
 import { randomUUID } from "node:crypto";
-import { launchDeskAgent, runner } from "../../agent/launchDeskAgent";
+import { runLaunchPlanWithCodexApp } from "../../agent/codexAppRunner";
 import { buildLaunchPrompt } from "../../agent/prompt";
+import { getLaunchDeskModel, getLaunchDeskRuntime } from "../../agent/runtime";
 import { launchRequestSchema } from "../../shared/launchSchema";
 import { configureSse, sendSse } from "../sse";
 
@@ -35,17 +36,39 @@ launchPlanRouter.post("/launch-plan", async (req, res) => {
 
   try {
     const input = launchRequestSchema.parse(req.body);
+    const runtime = getLaunchDeskRuntime();
     sendSse(res, {
       type: "status",
       requestId,
-      message: `Starting Launch Desk run with model ${process.env.LAUNCH_DESK_MODEL || "gpt-5.5"}.`
+      message: `Starting Launch Desk run through ${runtime} with model ${getLaunchDeskModel()}.`
     });
 
+    if (runtime === "codex-app") {
+      const output = await runLaunchPlanWithCodexApp(input, {
+        onStatus(message) {
+          sendSse(res, { type: "status", requestId, message });
+        },
+        onToolProgress(tool, stage, message) {
+          sendSse(res, { type: "tool_progress", tool, stage, message });
+        },
+        onTextDelta(delta) {
+          sendSse(res, { type: "text_delta", delta });
+        }
+      });
+      sendSse(res, { type: "final", output });
+      res.end();
+      return;
+    }
+
+    if (!process.env.OPENAI_API_KEY) {
+      throw new Error("OPENAI_API_KEY is required only when LAUNCH_DESK_AGENT_RUNTIME=openai-agents.");
+    }
+
+    const { launchDeskAgent, runner } = await import("../../agent/launchDeskAgent");
     const stream = await runner.run(launchDeskAgent, buildLaunchPrompt(input), {
       stream: true,
       maxTurns: 10
     });
-
     for await (const event of stream) {
       if (event.type === "run_item_stream_event") {
         const itemType = (event.item as { type?: string }).type || "";
