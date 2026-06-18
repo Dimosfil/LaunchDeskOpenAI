@@ -24,14 +24,14 @@ Planned changes:
 - [x] Add service guide and contract endpoints.
 - [x] Require live config-service lookup before backend binds a port.
 - [x] Register or refresh the service record through config-service contract.
-- [~] Document the workflow and verify locally.
+- [x] Document the workflow and verify locally.
 
 Execution order:
 
 - [x] Read local GI config-service rules and live config-service contract.
 - [x] Implement startup lookup and registration.
 - [x] Run typecheck/tests.
-- [ ] Start backend and verify config-service record.
+- [x] Start backend and verify config-service record.
 
 Risks or dependencies:
 
@@ -42,7 +42,7 @@ Verification:
 
 - [x] `npm run typecheck`
 - [x] `npm test`
-- [ ] `GET /services/launch-desk-openai` returns the registered Launch Desk record.
+- [x] `GET /services/launch-desk-openai` returns the registered Launch Desk record.
 
 ### 2026-06-18 Launch Desk Agents SDK App
 
