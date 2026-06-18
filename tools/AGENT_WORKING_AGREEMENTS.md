@@ -89,12 +89,13 @@
   checklist showing `English` as always selected and current additional
   languages as checked. Explain that `English` is the required primary
   commit-message language and cannot be disabled. Ask the user to reply with
-  language names or numbers. Render each option as a task-list bullet with the
-  number inside the label, such as `- [x] 1. English`; do not use
-  `1. [x] English`, because some chat renderers split the checkbox and label
-  onto separate lines. Keep the checkbox marker, number, and label on one
-  physical Markdown line; never emit a standalone checkbox line followed by a
-  separate numbered label line.
+  language names or numbers. Render each option as a plain inline checkbox
+  marker with the number and label on the same physical line, such as
+  `[x] 1. English` or `[ ] 2. Russian`. Do not use Markdown task-list syntax
+  such as `- [x] 1. English` or ordered-task syntax such as `1. [x] English`,
+  because some chat renderers split the checkbox control and label onto
+  separate lines. Never emit a standalone checkbox line followed by a separate
+  numbered label line.
 - When reporting this change, mention the plain
   `tools/project-memory/git-preferences.json` path instead of malformed or
   placeholder markdown links.
@@ -135,9 +136,11 @@ or:
   ask in three numbered steps. For each step, show a concise numbered Markdown
   checklist with the available languages and the current selection, then accept
   the user's next answer as numbers or language names for that step. Render
-  each option as a task-list bullet with the checkbox marker, number, and label
-  on one physical Markdown line, such as `- [x] 1. English`; never emit a
-  standalone checkbox line followed by a separate numbered label line.
+  each option as a plain inline checkbox marker with the number and label on
+  one physical line, such as `[x] 1. English`; never emit a standalone checkbox
+  line followed by a separate numbered label line.
+- When a unified project-language step has no current selection, default it to
+  `1 2`: `English`, then `Russian`.
 - If the user replies with only numbers, such as `1 2`, map them to the most
   recent checklist and preserve that order. Do not ask what those numbers mean
   after showing the checklist.
