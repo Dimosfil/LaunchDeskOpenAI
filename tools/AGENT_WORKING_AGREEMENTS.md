@@ -46,6 +46,18 @@
   work, update the relevant project-memory specification in the same scoped
   change. Write it so another agent could rebuild the behavior on a different
   language, framework, or platform. A handoff summary is not a substitute.
+- Keep project documentation separate from project memory. Put overview,
+  user-visible functionality, stack, commands, operations, and troubleshooting
+  in `README.md`, `docs/`, or the runbook. Put algorithms, business rules,
+  workflow contracts, state machines, invariants, and verification guarantees in
+  project memory.
+- After any meaningful implementation, refactor, migration, or configuration
+  cleanup batch, verify that every touched layer uses the intended
+  source-of-truth for changed defaults, policies, workflows, contracts, or
+  interpretation rules. Check backend, frontend, tests, docs, generated
+  examples, build metadata, and project-memory specs as relevant; keep unrelated
+  files and generated noise out of the batch; and distinguish harmless
+  line-ending warnings from real `git diff --check` whitespace errors.
 
 ## Git
 
@@ -54,6 +66,9 @@
   git finish requests. `gi коммит` commits scoped current changes only; `gi пуш`
   and `gi коммит пуш` commit scoped current changes and push the current branch;
   `gi только пуш` pushes existing local commits without creating a new commit.
+  Do not reinterpret `gi пуш` as a raw `git push`, a retry of a previous
+  terminal push, or a push-only command; if there are no scoped changes to
+  commit, report that clearly instead of falling back to push-only behavior.
   Inspect status, keep unrelated/user changes out, follow commit-message
   preferences, and stop on ambiguous scope, missing remote, conflicts, secrets,
   or push failures.
@@ -135,10 +150,7 @@ or:
 - If the unified project-language command does not include explicit languages,
   ask in three numbered steps. For each step, show a concise numbered Markdown
   checklist with the available languages and the current selection, then accept
-  the user's next answer as numbers or language names for that step. Render
-  each option as a plain inline checkbox marker with the number and label on
-  one physical line, such as `[x] 1. English`; never emit a standalone checkbox
-  line followed by a separate numbered label line.
+  the user's next answer as numbers or language names for that step.
 - When a unified project-language step has no current selection, default it to
   `1 2`: `English`, then `Russian`.
 - If the user replies with only numbers, such as `1 2`, map them to the most
@@ -214,6 +226,17 @@ or:
   retrieval metrics and activation limits. Report current counts, readiness,
   staleness, and recommendations; do not deploy heavy databases or external
   services by default.
+- Use `gi refactor`, `gi рефактор`, or `ги рефактор` for a full current-project
+  refactor under all applicable GI rules. Read local instructions, contracts,
+  manifests, project memory, and tests first; create a concise plan; then work
+  in small verifiable batches that preserve user-visible behavior unless the
+  user explicitly changes it. Cover architecture boundaries, configuration
+  boundaries, hard-code removal, development-tool/product separation,
+  SOLID/DRY/clean-code concerns, duplicated business logic, contracts, tests,
+  project-memory updates, and cross-layer source-of-truth consistency. Ask
+  before destructive operations, data migrations, public API or storage
+  contract changes, dependency replacements, formatting-only churn, or
+  private/external paths.
 - Use `gi rebuild` for the current project/application rebuild only, such as
   producing an executable, package, or documented build artifact. Use
   `gi tools rebuild` /
@@ -224,6 +247,18 @@ or:
   During `gi обновить`, migrations that change RAG rules, indexers, chunking,
   embedding metadata, or retrieval adapters must leave affected rebuild state
   stale until the documented rebuild and status checks succeed.
+- Treat `gi prod`, `gi production`, `gi прод`, and `ги прод` as production
+  service publication requests only for online services connected to real
+  remote APIs. Normal development, refactors, tests, cleanup, formatting, and
+  `gi restart` use the development checkout/service and must not edit, reset,
+  stop, or test inside the production service folder. For `gi prod`, read the
+  project-local production contract, build or prepare the documented
+  development artifact, sync only approved files into the production folder,
+  preserve production-local secrets, config, databases, logs, caches, sessions,
+  webhook/API state, and service manager files, then restart/reload/switch over
+  and verify only through documented commands. If the production folder,
+  include/exclude rules, health check, or rollback path is missing, ask one
+  concise question instead of guessing.
 - Keep `gi` command responses scoped to the shared instruction-kit command. Do
   not resume an older product task after a `gi` command unless the user
   explicitly asks.
@@ -271,6 +306,25 @@ or:
   test commands and produce a compact verification plan for the current feature,
   bug fix, or release check. Plan first; run checks only when the user asks or
   when the current task already requires verification.
+- Treat `gi test task`, `gi testing task`, `gi тест таск`, `ги тест таск`, and
+  equivalent wording as requests to set the active release/full-system
+  verification workload for the current project. The supplied task text is the
+  scenario for the next `gi test`, not evidence that the scenario already
+  passed.
+- Treat `gi test`, `ги тест`, `gi full test`, `gi release test`, and equivalent
+  full-project test wording as requests to run the documented verification flow
+  against the active test task. Do not confuse this with `gi test plan`, which
+  remains plan-only by default. Dry-runs, simulations, dispatcher-only runs,
+  replayed logs, mock-only checks, and compile/unit-only checks are diagnostics
+  only and must not be run during `gi test` unless the user explicitly asks for
+  that diagnostic mode; they must never be reported as a passed `gi test`.
+  Exercise the documented live runtime surface for the selected task, including
+  apps, backend/API, storage, queues/workers, UI/auth, service discovery,
+  orchestrator or agent handoff loops, and health/contract endpoints when the
+  project defines them. If the live system cannot be started or reached, report
+  `gi test` as blocked or not checked. Old summaries, screenshots, completed
+  demos, previous task statuses, and old chat snippets are evidence only; rerun
+  the current documented checks or report the exact blocker.
 - For verification plans and smoke checks, confirm exact CLI flags, ports,
   routes, methods, JSON payload fields, and required environment variables from
   current local instructions, manifests, config, or source code. Summaries and
@@ -286,6 +340,16 @@ or:
   system caches, sibling projects, or arbitrary user-home folders. If exact
   reset paths or commands are missing, ask one concise question instead of
   guessing.
+- Treat `gi default`, `gi defaults`, and `ги дефолт` as default-state reset
+  requests. Restore only documented project-owned app state, generated caches,
+  local settings, onboarding flags, temporary profiles, and other rebuildable
+  first-run/default state. Read local reset, cleanup, first-run, backup, run,
+  and test instructions before clearing anything. Do not delete source files,
+  project memory, instruction-kit files, user documents, production data,
+  secrets, credentials, shared system caches, sibling projects, or arbitrary
+  user-home folders. If reset targets are undocumented, ask one concise question;
+  if reset could be irreversible or user-owned data is involved, require
+  explicit confirmation and prefer backup or rename when local rules allow it.
 - Treat a first message that points to a shared instruction library as an
   instruction bootstrap, not as a request to add that library as a dependency.
 - Treat `init <source>`, `инит <source>`, `инициализируй <source>`, and

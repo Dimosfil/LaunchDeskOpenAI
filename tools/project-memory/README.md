@@ -1,32 +1,49 @@
 # Project Memory
 
-This folder stores durable project knowledge for AI agents.
+This folder stores implementation-driving project knowledge for AI agents.
 
-Use it for verified findings that should survive chat resets:
+Use it for verified behavior, rules, and implementation contracts that should
+survive chat resets:
 
-- architecture notes
 - debugging findings
 - important decisions
-- product and business rules
+- business rules and invariants
 - platform-neutral feature specifications
-- workflow algorithms and state diagrams
+- workflow algorithms, contracts, and state diagrams
 - architecture migration history
 - known pitfalls
-- local workflows
-- dependency maps
+- dependency and integration contracts that affect behavior
 - reusable agent experience that may improve `gi`
+
+Keep general project documentation in `README.md`, `docs/`, and the runbook:
+project overview, visible functionality, setup, commands, stack, operations,
+examples, screenshots, troubleshooting, and release notes.
 
 Do not store secrets or credentials here.
 
-## Summary Versus Project Memory
+Do not store raw work results, generated product outputs, screenshots, photos,
+crawled/downloaded files, large logs, model outputs, build artifacts, export
+bundles, or run datasets in this folder. Put those files in a project-local
+artifact, evidence, output, data, or docs-asset location and keep only compact
+summaries, manifests, checksums, or links here when they are needed for a
+decision, behavior contract, failure, or verification result.
 
+## Documentation Versus Summary Versus Project Memory
+
+`README.md`, `docs/`, and runbooks are the project documentation layer.
 `tools/summary/` is compact handoff state for the current or recent chat.
-`tools/project-memory/` is long-lived product and project knowledge.
+`tools/project-memory/` is long-lived implementation-driving knowledge.
 
 Write project-memory documents so another agent could rebuild the project on a
 different language, framework, platform, or UI stack and preserve the same
 behavior. Code is the current implementation; project-memory specifications are
 the portable behavioral source of truth.
+
+Follow `patterns/PROJECT_DOCUMENTATION_LAYERS.md` when deciding which layer to
+update. If a change affects user-visible functionality, stack, commands, setup,
+or operations, update project documentation. If a change affects algorithms,
+business rules, states, integrations, failure handling, or verification
+contracts, update project memory.
 
 Recommended specification structure:
 
@@ -34,8 +51,6 @@ Recommended specification structure:
 tools/project-memory/
   architecture-migrations.md
   specs/
-    product-overview.md
-    glossary.md
     features/
     business-rules/
     data-model/
@@ -43,9 +58,23 @@ tools/project-memory/
       connected-projects.md
 ```
 
-Split documents by meaning. Keep feature behavior, business logic, architecture
-history, and implementation mapping searchable as separate focused files instead
-of one giant document.
+Split documents by meaning. Keep feature algorithms, business logic,
+architecture contracts, and implementation mapping searchable as separate
+focused files instead of one giant document.
+
+Keep the current technology stack in project documentation. For compatibility,
+GI-enabled projects may keep the stack inventory at:
+
+```text
+tools/project-memory/specs/technology-stack.md
+```
+
+If the project uses another canonical file such as `docs/technology-stack.md`,
+link to it instead of maintaining two independent stack descriptions. Record
+verified languages, runtimes, frameworks, package managers, build/test tools,
+storage, external services, commands, evidence paths, and open gaps. Update it
+when stack components are added, removed, upgraded, replaced, or materially
+reconfigured.
 
 Keep a connected-projects register when this project depends on, researches,
 vendors, or regularly interacts with external repositories, cloned examples,
@@ -251,6 +280,10 @@ count, index path, freshness caveats, and readiness.
 - `architecture.md`: verified architecture notes.
 - `decisions.md`: durable decisions and rationale.
 - `known-issues.md`: recurring bugs, caveats, and workarounds.
+
+Avoid folders such as `evidence/`, `photos/`, `outputs/`, `runs/`, `exports/`,
+or `builds/` inside project memory unless the project has explicitly defined
+them as small, reviewable manifests rather than raw artifact storage.
 
 ## Task Planning
 
