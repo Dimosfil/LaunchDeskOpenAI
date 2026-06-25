@@ -7,7 +7,9 @@ const launchInput = {
   audience: "Engineering managers",
   launchDate: "2026-07-15",
   constraints: "Include rollback guidance, support path, monitoring links, and incident escalation.",
-  assets: "Dashboard mockups, beta feedback quotes, and product spec"
+  assets: "Dashboard mockups, beta feedback quotes, and product spec",
+  humanHourlyRate: 2500,
+  agentHourlyRate: 300
 };
 
 describe("launch planning tools", () => {

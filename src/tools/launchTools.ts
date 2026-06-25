@@ -7,7 +7,9 @@ const launchInput = z.object({
   audience: z.string(),
   launchDate: z.string(),
   constraints: z.string().optional().default(""),
-  assets: z.string().optional().default("")
+  assets: z.string().optional().default(""),
+  humanHourlyRate: z.coerce.number().min(0).optional().default(0),
+  agentHourlyRate: z.coerce.number().min(0).optional().default(0)
 });
 
 const words = (value: string) =>

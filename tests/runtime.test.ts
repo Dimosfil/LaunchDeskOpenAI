@@ -12,7 +12,9 @@ const launchInput = {
   audience: "Engineering managers",
   launchDate: "2026-07-15",
   constraints: "Include rollback guidance, monitoring links, and support escalation.",
-  assets: "Product spec, dashboard mockups, beta quotes, and draft changelog"
+  assets: "Product spec, dashboard mockups, beta quotes, and draft changelog",
+  humanHourlyRate: 2500,
+  agentHourlyRate: 300
 };
 
 describe("Launch Desk runtime selection", () => {
@@ -47,6 +49,8 @@ describe("Codex app launch planning prompt", () => {
     expect(prompt).toContain("TASK_CARDS_JSON");
     expect(prompt).toContain("titleRu");
     expect(prompt).toContain("agentHours");
+    expect(prompt).toContain("2500 per hour");
+    expect(prompt).toContain("300 per hour");
     expect(prompt).toContain("Use this humanHours rubric");
     expect(prompt).toContain("estimateBasisRu");
     expect(prompt).toContain("Engineering Lead");

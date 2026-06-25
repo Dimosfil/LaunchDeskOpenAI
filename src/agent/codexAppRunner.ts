@@ -337,12 +337,29 @@ export function buildCodexLaunchPrompt(input: LaunchRequest, toolOutputs: Record
 Local deterministic tool outputs:
 ${JSON.stringify(toolOutputs, null, 2)}
 
-Use the tool outputs as evidence. Return a concise release plan with these sections:
+Use the tool outputs as evidence. Return a concise release plan in this exact readable-output structure:
+
+ENGLISH_PLAN_START
 1. Priority plan
 2. Risk register
 3. Owner checklist
 4. Launch copy
 5. Follow-up questions
+ENGLISH_PLAN_END
+
+RUSSIAN_PLAN_START
+1. Приоритетный план
+2. Реестр рисков
+3. Чеклист ответственных
+4. Тексты для запуска
+5. Уточняющие вопросы
+RUSSIAN_PLAN_END
+
+Do not wrap ENGLISH_PLAN or RUSSIAN_PLAN in code fences. Put real plan content under each numbered heading, not just the headings.
+
+The Russian plan must contain the same decisions, risks, owners, launch copy guidance, and questions as the English plan, translated naturally into Russian.
+
+In both readable plans, include an estimate table or compact list for the work plan. For each concrete work item, name the owner, dependency, calendar timing, human-hours, agent-hours, hybrid-mode assumption, human cost, agent cost when an agent hourly rate is provided, and hybrid cost. Do not invent bot cost without a bot hourly rate; keep bot effort as agent-hours.
 
 After the readable plan, append a machine-readable task card block exactly in this shape:
 TASK_CARDS_JSON

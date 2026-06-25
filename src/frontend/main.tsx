@@ -13,11 +13,17 @@ import {
   Rocket,
   Send,
   Sparkles,
-  Users
+  Users,
+  Wallet
 } from "lucide-react";
 import "./styles.css";
+import {
+  extractNumberedSections,
+  getEnglishPlanText,
+  getRussianPlanText
+} from "../shared/launchOutput";
 import type { StreamMessage } from "../shared/launchSchema";
-import { parseLaunchTaskCards, stripLaunchTaskCardsBlock, totalLaunchTaskHours } from "../shared/taskCards";
+import { parseLaunchTaskCards, totalLaunchTaskHours } from "../shared/taskCards";
 
 type FormState = {
   productBrief: string;
@@ -25,28 +31,77 @@ type FormState = {
   launchDate: string;
   constraints: string;
   assets: string;
+  humanHourlyRate: string;
+  agentHourlyRate: string;
 };
 
-type OutputTab = "plan" | "tasks";
+type OutputTab = "plan" | "planRu" | "readiness" | "readinessRu" | "tasks";
+
+const hybridDelegationRate = 0.45;
+const hybridReviewRate = 0.25;
+const storageKey = "launch-desk-ui-state-v1";
 
 const initialForm: FormState = {
   productBrief:
-    "We are launching team-level release scorecards that summarize deployment confidence, unresolved blockers, and customer-impact notes before every production rollout.",
-  audience: "Engineering managers, release captains, and product leads at B2B SaaS teams",
+    "Нужно составить максимально точный план работ по входящим пользовательским инпутам: разложить проект на этапы и задачи, оценить сроки, зависимости, риски, стоимость и результат каждого этапа. План должен отдельно показывать работу человека, работу AI-бота и гибридный режим разработки, где человек принимает решения и проверяет качество, а бот готовит черновики, код, тесты, документацию и аналитические артефакты.",
+  audience: "Владелец продукта, технический лид, проектный менеджер и заказчик, которым нужно понять бюджет, сроки и состав работ до старта разработки.",
   launchDate: "2026-07-15",
   constraints:
-    "Must keep current deployment process unchanged, include rollback guidance, provide monitoring links, and avoid promising automated approvals in v1.",
-  assets: "Product spec, early dashboard mockups, beta feedback quotes, internal release process checklist"
+    "Оценивать только по входящим инпутам и явно фиксировать допущения. Для каждой задачи указать человеко-часы, бот-часы, гибридный сценарий, календарную длительность, владельца, зависимости, критерий готовности и риск. Стоимость считать по ставке человека в час; стоимость бота не выдумывать, если отдельный тариф не задан. Отдельно показать MVP, полный релиз и необязательные улучшения.",
+  assets:
+    "Описание продукта или идеи, список функций, ограничения, желаемые сроки, доступные материалы, текущий код или дизайн, требования заказчика, приоритеты, интеграции, роли участников, ставка человека в час.",
+  humanHourlyRate: "2500",
+  agentHourlyRate: "300"
 };
 
+function calculateHybridHumanHours(humanHours: number, agentHours: number) {
+  if (agentHours <= 0) {
+    return humanHours;
+  }
+  const retainedHumanHours = humanHours * (1 - hybridDelegationRate);
+  const reviewHours = agentHours * hybridReviewRate;
+  return Math.min(humanHours, retainedHumanHours + reviewHours);
+}
+
+type PersistedState = {
+  form?: Partial<FormState>;
+  text?: string;
+  finalOutput?: string;
+  events?: StreamMessage[];
+  error?: string;
+  activeTab?: OutputTab;
+};
+
+function loadPersistedState(): PersistedState {
+  try {
+    const raw = window.localStorage.getItem(storageKey);
+    return raw ? (JSON.parse(raw) as PersistedState) : {};
+  } catch {
+    return {};
+  }
+}
+
 function App() {
-  const [form, setForm] = React.useState<FormState>(initialForm);
-  const [text, setText] = React.useState("");
-  const [finalOutput, setFinalOutput] = React.useState("");
-  const [events, setEvents] = React.useState<StreamMessage[]>([]);
+  const persisted = React.useMemo(loadPersistedState, []);
+  const [form, setForm] = React.useState<FormState>({ ...initialForm, ...persisted.form });
+  const [text, setText] = React.useState(persisted.text || "");
+  const [finalOutput, setFinalOutput] = React.useState(persisted.finalOutput || "");
+  const [events, setEvents] = React.useState<StreamMessage[]>(persisted.events || []);
   const [isRunning, setIsRunning] = React.useState(false);
-  const [error, setError] = React.useState("");
-  const [activeTab, setActiveTab] = React.useState<OutputTab>("plan");
+  const [error, setError] = React.useState(persisted.error || "");
+  const [activeTab, setActiveTab] = React.useState<OutputTab>(persisted.activeTab || "plan");
+
+  React.useEffect(() => {
+    const state: PersistedState = {
+      form,
+      text,
+      finalOutput,
+      events,
+      error,
+      activeTab
+    };
+    window.localStorage.setItem(storageKey, JSON.stringify(state));
+  }, [activeTab, error, events, finalOutput, form, text]);
 
   const update = (field: keyof FormState) => (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setForm((current) => ({ ...current, [field]: event.target.value }));
@@ -110,10 +165,24 @@ function App() {
   const toolEvents = events.filter((event) => event.type === "tool_progress");
   const status = [...events].reverse().find((event: StreamMessage) => event.type === "status");
   const outputText = finalOutput || text;
-  const planText = stripLaunchTaskCardsBlock(outputText);
+  const planText = getEnglishPlanText(outputText);
+  const russianPlanText = getRussianPlanText(outputText);
+  const readinessText = extractNumberedSections(planText, [2, 3, 5]);
+  const russianReadinessText = extractNumberedSections(russianPlanText, [2, 3, 5]);
   const taskCards = parseLaunchTaskCards(outputText);
   const taskTotals = totalLaunchTaskHours(taskCards);
+  const humanHourlyRate = Number(form.humanHourlyRate) || 0;
+  const agentHourlyRate = Number(form.agentHourlyRate) || 0;
+  const hybridHumanHours = calculateHybridHumanHours(taskTotals.humanHours, taskTotals.agentHours);
+  const savedHumanHours = Math.max(0, taskTotals.humanHours - hybridHumanHours);
+  const humanCost = taskTotals.humanHours * humanHourlyRate;
+  const agentCost = taskTotals.agentHours * agentHourlyRate;
+  const hybridCost = hybridHumanHours * humanHourlyRate + agentCost;
   const formatHours = (hours: number) => (Number.isInteger(hours) ? hours.toString() : hours.toFixed(1));
+  const formatMoney = (value: number) =>
+    value.toLocaleString("ru-RU", {
+      maximumFractionDigits: 0
+    });
 
   return (
     <main className="appShell">
@@ -148,6 +217,35 @@ function App() {
                 <CalendarDays size={16} aria-hidden /> Launch date
               </span>
               <input value={form.launchDate} onChange={update("launchDate")} placeholder="2026-07-15" />
+            </label>
+          </div>
+
+          <div className="twoColumn">
+            <label>
+              <span>
+                <Wallet size={16} aria-hidden /> Human hourly rate
+              </span>
+              <input
+                type="number"
+                min="0"
+                step="100"
+                value={form.humanHourlyRate}
+                onChange={update("humanHourlyRate")}
+                placeholder="2500"
+              />
+            </label>
+            <label>
+              <span>
+                <Bot size={16} aria-hidden /> Agent hourly rate
+              </span>
+              <input
+                type="number"
+                min="0"
+                step="50"
+                value={form.agentHourlyRate}
+                onChange={update("agentHourlyRate")}
+                placeholder="300"
+              />
             </label>
           </div>
 
@@ -213,6 +311,36 @@ function App() {
               Plan
             </button>
             <button
+              className={activeTab === "planRu" ? "tabButton active" : "tabButton"}
+              type="button"
+              role="tab"
+              aria-selected={activeTab === "planRu"}
+              onClick={() => setActiveTab("planRu")}
+            >
+              <FileText size={16} aria-hidden />
+              План
+            </button>
+            <button
+              className={activeTab === "readiness" ? "tabButton active" : "tabButton"}
+              type="button"
+              role="tab"
+              aria-selected={activeTab === "readiness"}
+              onClick={() => setActiveTab("readiness")}
+            >
+              <AlertCircle size={16} aria-hidden />
+              Risks
+            </button>
+            <button
+              className={activeTab === "readinessRu" ? "tabButton active" : "tabButton"}
+              type="button"
+              role="tab"
+              aria-selected={activeTab === "readinessRu"}
+              onClick={() => setActiveTab("readinessRu")}
+            >
+              <AlertCircle size={16} aria-hidden />
+              Риски
+            </button>
+            <button
               className={activeTab === "tasks" ? "tabButton active" : "tabButton"}
               type="button"
               role="tab"
@@ -232,6 +360,30 @@ function App() {
                 <div className="emptyState">Your prioritized plan, risks, owner checklist, copy, and follow-up questions will stream here.</div>
               )}
             </article>
+          ) : activeTab === "planRu" ? (
+            <article className="planOutput">
+              {russianPlanText ? (
+                <pre>{russianPlanText}</pre>
+              ) : (
+                <div className="emptyState">Русская версия плана появится здесь.</div>
+              )}
+            </article>
+          ) : activeTab === "readiness" ? (
+            <article className="planOutput">
+              {readinessText ? (
+                <pre>{readinessText}</pre>
+              ) : (
+                <div className="emptyState">Risk register, owner checklist, and follow-up questions will appear here.</div>
+              )}
+            </article>
+          ) : activeTab === "readinessRu" ? (
+            <article className="planOutput">
+              {russianReadinessText ? (
+                <pre>{russianReadinessText}</pre>
+              ) : (
+                <div className="emptyState">Риски, чеклист ответственных и уточняющие вопросы появятся здесь.</div>
+              )}
+            </article>
           ) : (
             <section className="tasksOutput">
               <div className="tasksHeader">
@@ -247,6 +399,26 @@ function App() {
                   <div className="metricPill">
                     <Bot size={15} aria-hidden />
                     <span>{formatHours(taskTotals.agentHours)} agent h</span>
+                  </div>
+                  <div className="metricPill">
+                    <Clock3 size={15} aria-hidden />
+                    <span>{formatHours(hybridHumanHours)} hybrid human h</span>
+                  </div>
+                  <div className="metricPill">
+                    <Sparkles size={15} aria-hidden />
+                    <span>{formatHours(savedHumanHours)} saved h</span>
+                  </div>
+                  <div className="metricPill">
+                    <Wallet size={15} aria-hidden />
+                    <span>{humanHourlyRate ? `${formatMoney(humanCost)} human cost` : "human rate not set"}</span>
+                  </div>
+                  <div className="metricPill">
+                    <Bot size={15} aria-hidden />
+                    <span>{agentHourlyRate ? `${formatMoney(agentCost)} agent cost` : "agent rate not set"}</span>
+                  </div>
+                  <div className="metricPill">
+                    <Sparkles size={15} aria-hidden />
+                    <span>{humanHourlyRate ? `${formatMoney(hybridCost)} hybrid cost` : "rate not set"}</span>
                   </div>
                 </div>
               </div>
@@ -265,6 +437,19 @@ function App() {
                           <span title="Agent hours">
                             <Bot size={14} aria-hidden />
                             {formatHours(task.agentHours)}h
+                          </span>
+                          <span title="Hybrid human plus agent hours">
+                            <Clock3 size={14} aria-hidden />
+                            {formatHours(calculateHybridHumanHours(task.humanHours, task.agentHours))}h
+                          </span>
+                          <span title="Hybrid cost">
+                            <Wallet size={14} aria-hidden />
+                            {humanHourlyRate
+                              ? formatMoney(
+                                  calculateHybridHumanHours(task.humanHours, task.agentHours) * humanHourlyRate +
+                                    task.agentHours * agentHourlyRate
+                                )
+                              : "0"}
                           </span>
                         </div>
                       </div>

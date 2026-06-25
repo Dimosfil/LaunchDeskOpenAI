@@ -5,7 +5,9 @@ export const launchRequestSchema = z.object({
   audience: z.string().min(2, "Audience is required."),
   launchDate: z.string().min(4, "Launch date is required."),
   constraints: z.string().optional().default(""),
-  assets: z.string().optional().default("")
+  assets: z.string().optional().default(""),
+  humanHourlyRate: z.coerce.number().min(0).optional().default(0),
+  agentHourlyRate: z.coerce.number().min(0).optional().default(0)
 });
 
 export type LaunchRequest = z.infer<typeof launchRequestSchema>;
