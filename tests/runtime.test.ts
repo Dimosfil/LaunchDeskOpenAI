@@ -14,7 +14,8 @@ const launchInput = {
   constraints: "Include rollback guidance, monitoring links, and support escalation.",
   assets: "Product spec, dashboard mockups, beta quotes, and draft changelog",
   humanHourlyRate: 2500,
-  agentHourlyRate: 300
+  agentHourlyRate: 300,
+  attachments: []
 };
 
 describe("Launch Desk runtime selection", () => {

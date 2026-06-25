@@ -9,7 +9,19 @@ const launchInput = z.object({
   constraints: z.string().optional().default(""),
   assets: z.string().optional().default(""),
   humanHourlyRate: z.coerce.number().min(0).optional().default(0),
-  agentHourlyRate: z.coerce.number().min(0).optional().default(0)
+  agentHourlyRate: z.coerce.number().min(0).optional().default(0),
+  attachments: z
+    .array(
+      z.object({
+        id: z.string(),
+        name: z.string(),
+        type: z.string().optional().default(""),
+        size: z.coerce.number().min(0),
+        text: z.string().optional().default("")
+      })
+    )
+    .optional()
+    .default([])
 });
 
 const words = (value: string) =>
@@ -19,8 +31,29 @@ const words = (value: string) =>
     .split(/\s+/)
     .filter(Boolean);
 
+const attachmentText = (input: LaunchRequest) =>
+  input.attachments
+    .map((attachment) => `${attachment.name} ${attachment.type} ${attachment.text}`)
+    .join(" ");
+
+function planningBrief(input: LaunchRequest) {
+  const explicitBrief = input.productBrief.trim();
+  if (explicitBrief) {
+    return explicitBrief;
+  }
+
+  const extractedText = input.attachments.map((attachment) => attachment.text.trim()).find(Boolean);
+  if (extractedText) {
+    return extractedText;
+  }
+
+  return input.attachments.length
+    ? `Attached documents: ${input.attachments.map((attachment) => attachment.name).join(", ")}.`
+    : "";
+}
+
 export function extractLaunchTasks(input: LaunchRequest) {
-  const text = `${input.productBrief} ${input.constraints} ${input.assets}`;
+  const text = `${input.productBrief} ${input.constraints} ${input.assets} ${attachmentText(input)}`;
   const tokens = new Set(words(text));
   const hasDocs = /doc|guide|faq|copy|blog|page|website|landing/i.test(text);
   const hasData = /metric|analytics|dashboard|experiment|cohort|kpi/i.test(text);
@@ -75,25 +108,27 @@ export function extractLaunchTasks(input: LaunchRequest) {
 }
 
 export function checkLaunchReadiness(input: LaunchRequest) {
+  const brief = planningBrief(input);
+  const hasAttachmentDetails = input.attachments.some((attachment) => attachment.text.trim());
   const fields = [
-    { name: "Product brief", ready: input.productBrief.trim().length >= 80 },
+    { name: "Product brief", ready: brief.length >= 80 || hasAttachmentDetails },
     { name: "Audience", ready: input.audience.trim().length >= 8 },
     { name: "Launch date", ready: Boolean(input.launchDate.trim()) },
     { name: "Constraints", ready: input.constraints.trim().length >= 15 },
-    { name: "Assets", ready: input.assets.trim().length >= 10 }
+    { name: "Assets", ready: input.assets.trim().length >= 10 || input.attachments.length > 0 }
   ];
   const score = Math.round((fields.filter((field) => field.ready).length / fields.length) * 100);
   const missing = fields.filter((field) => !field.ready).map((field) => field.name);
 
   const rubric = [
-    { area: "Narrative", status: input.productBrief.length >= 80 ? "green" : "yellow" },
+    { area: "Narrative", status: brief.length >= 80 || hasAttachmentDetails ? "green" : "yellow" },
     { area: "Audience fit", status: input.audience.length >= 8 ? "green" : "yellow" },
     { area: "Operational readiness", status: /rollback|monitor|alert|support|incident|slo/i.test(input.constraints) ? "green" : "red" },
-    { area: "Asset readiness", status: input.assets.length >= 10 ? "green" : "yellow" }
+    { area: "Asset readiness", status: input.assets.length >= 10 || input.attachments.length > 0 ? "green" : "yellow" }
   ];
 
   const followUpQuestions = [
-    !/metric|kpi|goal|success/i.test(input.productBrief) &&
+    !/metric|kpi|goal|success/i.test(brief) &&
       "What measurable success metric should the launch optimize for?",
     !/rollback|monitor|alert|incident|slo/i.test(input.constraints) &&
       "What rollback, monitoring, or incident response plan should be assumed?",
@@ -119,7 +154,7 @@ export function generateOwnerChecklist(input: LaunchRequest) {
 }
 
 export function draftLaunchCopy(input: LaunchRequest) {
-  const conciseBrief = input.productBrief.trim().replace(/\s+/g, " ").slice(0, 220);
+  const conciseBrief = planningBrief(input).replace(/\s+/g, " ").slice(0, 220) || "the attached launch brief";
   return {
     channels: [
       {

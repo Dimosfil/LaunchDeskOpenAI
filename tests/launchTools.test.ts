@@ -9,7 +9,8 @@ const launchInput = {
   constraints: "Include rollback guidance, support path, monitoring links, and incident escalation.",
   assets: "Dashboard mockups, beta feedback quotes, and product spec",
   humanHourlyRate: 2500,
-  agentHourlyRate: 300
+  agentHourlyRate: 300,
+  attachments: []
 };
 
 describe("launch planning tools", () => {

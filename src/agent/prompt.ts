@@ -1,11 +1,34 @@
 import type { LaunchRequest } from "../shared/launchSchema";
 
+function formatBytes(size: number) {
+  if (size < 1024) return `${size} B`;
+  if (size < 1024 * 1024) return `${(size / 1024).toFixed(1)} KB`;
+  return `${(size / 1024 / 1024).toFixed(1)} MB`;
+}
+
+function formatAttachments(input: LaunchRequest) {
+  if (!input.attachments.length) {
+    return "None";
+  }
+
+  return input.attachments
+    .map((attachment, index) => {
+      const text = attachment.text.trim();
+      const content = text
+        ? `\nExtracted text:\n${text.slice(0, 12000)}${text.length > 12000 ? "\n[Attachment text truncated.]" : ""}`
+        : "\nExtracted text: Not available for this file type.";
+
+      return `Attachment ${index + 1}: ${attachment.name} (${attachment.type || "unknown type"}, ${formatBytes(attachment.size)})${content}`;
+    })
+    .join("\n\n");
+}
+
 export function buildLaunchPrompt(input: LaunchRequest) {
   return `
 Build a release plan from this launch brief.
 
 Product brief:
-${input.productBrief}
+${input.productBrief || "Not provided. Use the attached documents as the primary brief."}
 
 Audience:
 ${input.audience}
@@ -18,6 +41,9 @@ ${input.constraints || "Not provided"}
 
 Available assets:
 ${input.assets || "Not provided"}
+
+Attached documents:
+${formatAttachments(input)}
 
 Human hourly rate:
 ${input.humanHourlyRate ? `${input.humanHourlyRate} per hour` : "Not provided"}

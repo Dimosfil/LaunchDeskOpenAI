@@ -18,6 +18,7 @@ body {
 
 button,
 input,
+select,
 textarea {
   font: inherit;
 }
@@ -123,7 +124,8 @@ label span {
 }
 
 textarea,
-input {
+input,
+select {
   width: 100%;
   border: 1px solid #cedbd7;
   border-radius: 8px;
@@ -143,9 +145,111 @@ textarea {
 }
 
 textarea:focus,
-input:focus {
+input:focus,
+select:focus {
   border-color: #1f665d;
   box-shadow: 0 0 0 3px rgba(31, 102, 93, 0.15);
+}
+
+.attachmentPanel {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  border: 1px dashed #bfd1cc;
+  border-radius: 8px;
+  background: #f8fbfa;
+  padding: 12px;
+}
+
+.attachmentHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.attachmentHeader > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  color: #263531;
+  font-weight: 700;
+  font-size: 0.92rem;
+}
+
+.attachmentHeader input {
+  display: none;
+}
+
+.attachButton {
+  width: auto;
+  height: 34px;
+  display: inline-flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  border: 1px solid #cedbd7;
+  border-radius: 8px;
+  padding: 0 11px;
+  color: #174c45;
+  background: #ffffff;
+  font-size: 0.86rem;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.attachmentList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.attachmentItem {
+  display: grid;
+  grid-template-columns: 18px minmax(0, 1fr) 30px;
+  align-items: center;
+  gap: 9px;
+  border: 1px solid #dce7e3;
+  border-radius: 8px;
+  background: #ffffff;
+  padding: 9px;
+}
+
+.attachmentItem strong,
+.attachmentItem span {
+  display: block;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.attachmentItem strong {
+  color: #263531;
+  font-size: 0.88rem;
+}
+
+.attachmentItem span {
+  color: #60706b;
+  font-size: 0.78rem;
+}
+
+.removeAttachment {
+  width: 30px;
+  height: 30px;
+  display: grid;
+  place-items: center;
+  border: 0;
+  border-radius: 6px;
+  color: #7b4248;
+  background: #fff1f2;
+  cursor: pointer;
+}
+
+.attachmentHint {
+  color: #60706b;
+  font-size: 0.84rem;
 }
 
 .twoColumn {
@@ -265,6 +369,95 @@ input:focus {
   background: #f4f8f6;
 }
 
+.outputControls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.exportControls {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.downloadButton {
+  height: 34px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  border: 0;
+  border-radius: 6px;
+  padding: 0 11px;
+  font-size: 0.84rem;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.metricChecks {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 6px;
+  max-width: 560px;
+}
+
+.metricCheck {
+  width: auto;
+  height: 30px;
+  display: inline-flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid #dce7e3;
+  border-radius: 8px;
+  padding: 0 8px;
+  color: #53645f;
+  background: #ffffff;
+  font-size: 0.78rem;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.metricCheck input {
+  width: 14px;
+  height: 14px;
+  margin: 0;
+  accent-color: #174c45;
+}
+
+.metricCheck span {
+  color: inherit;
+  font-size: inherit;
+  font-weight: inherit;
+}
+
+.exportSelect {
+  width: auto;
+  min-width: 118px;
+  height: 34px;
+  padding: 0 10px;
+  color: #263531;
+  background: #ffffff;
+  font-size: 0.84rem;
+  font-weight: 800;
+}
+
+.downloadButton {
+  color: #ffffff;
+  background: #174c45;
+}
+
+.downloadButton:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
 .tabButton {
   height: 34px;
   display: inline-flex;
@@ -354,6 +547,11 @@ input:focus {
   font-size: 0.84rem;
   font-weight: 800;
   white-space: nowrap;
+}
+
+.metricPill.muted {
+  color: #6e7f79;
+  background: #eef3f1;
 }
 
 .taskGrid {
@@ -494,8 +692,25 @@ input:focus {
     width: 100%;
   }
 
+  .outputControls,
+  .exportControls {
+    align-items: stretch;
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
   .tabButton {
     flex: 1 1 0;
+  }
+
+  .metricChecks,
+  .downloadButton,
+  .exportSelect {
+    width: 100%;
+  }
+
+  .metricChecks {
+    justify-content: flex-start;
   }
 
   .totalMetrics {
