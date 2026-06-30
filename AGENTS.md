@@ -88,8 +88,8 @@ Use the RAG startup flow and retrieve only task-relevant context.
 - Startup, restore, project goal, bug evidence, PDF inspection, repository
   cleanup, filesystem boundaries, and first-message handling:
   `patterns/AGENTS_RUNTIME/07-startup-and-scope.md`
-- Config-service, service guide/contract lookup, task manager commands, sprint
-  commands, and web-service port registration:
+- Config-service, service guide/contract lookup, task manager commands,
+  manager-backed and local sprint commands, and web-service port registration:
   `patterns/AGENTS_RUNTIME/08-config-service-and-task-manager.md`
 - Dev/prod online service publication, FTP deploy, restart/reboot, first test,
   full test, default reset, installer packaging, SQL/vector inspection, and

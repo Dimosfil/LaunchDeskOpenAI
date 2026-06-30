@@ -60,6 +60,19 @@
   submit completion through the manager contract. Stop with the exact blocker
   instead of falling back to generic `gi start`, local task notes, raw intake,
   guessed endpoints, or filesystem task edits.
+- Treat `gi local sprint`, `gi sprint local`, `gi локальный спринт`,
+  `gi спринт локально`, and equivalent explicitly local sprint wording as
+  requests to run a local sprint checklist without a
+  configured task manager or config-service. Use the sprint content supplied in
+  the current message, current chat context, or a project-local planning file
+  named by local instructions. If no sprint content is available, ask one short
+  question for the local sprint goal and task list. Track progress only in the
+  current response or in a project-local checklist file when local instructions
+  already define one; do not create raw manager intake, edit task-manager
+  internals, resolve config-service, or claim that a visible Sprint/Cycle was
+  created or updated. If the user asks for `gi start sprint` and no manager is
+  configured, stop with the manager/config-service blocker and mention
+  `gi local sprint` as the explicit local alternative.
 - Treat task-manager sync commands as routine execution steps, similar in
   certainty to `gi commit`, `gi push`, or FTP deploy commands after the user has
   supplied the content or selected workflow. A fast or weaker model may execute
@@ -81,7 +94,16 @@
   startup, read the configured config-service URL, verify the config service is
   reachable, and query the app's own `service_id` startup/service record. If
   the record exists, bind only the recorded port and use config-service records
-  for neighboring service endpoints. Treat ports and URLs in README files,
+  for neighboring service endpoints. Before starting a new process, check
+  whether the recorded port is already occupied. If it is occupied by the same
+  documented service instance, restart or reuse it only as the local run
+  contract allows. If the owner is another service, unknown, or cannot be
+  verified from documented identity signals such as service id, command, cwd,
+  health endpoint, or process metadata, stop with a port-conflict blocker. Do
+  not kill the owner without explicit user approval and verified ownership, and
+  do not bind an alternate port just because the recorded one is busy. Changing
+  the port changes the browser origin and can hide browser-owned state such as
+  localStorage, cookies, and IndexedDB. Treat ports and URLs in README files,
   runbooks, old logs, screenshots, package metadata, and examples as hints for
   documentation drift only; they are not runtime authority until reflected in a
   config-service record. If the record is missing and project-local
